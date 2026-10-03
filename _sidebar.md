@@ -11,7 +11,7 @@
   * [2.1.4 BASSMIDI](README.md#214-bassmidi)
 * [2.2 强大的MIDI编辑软件](README.md#22-强大的midi编辑软件)
   * [2.2.1 Domino](README.md#221-domino)
-  * [2.2.2 Cubase/Nuendo/Reaper\](README.md#222-cubasenuendoreaper\)
+  * [2.2.2 Cubase/Nuendo/Reaper](README.md#222-cubasenuendoreaper\)
   * [2.2.3 FL Studio](README.md#223-fl-studio)
   * [2.2.4 SynthFont](README.md#224-synthfont)
   * [2.2.5 Wavetone](README.md#225-wavetone)
