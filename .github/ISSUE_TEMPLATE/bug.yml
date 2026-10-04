@@ -1,0 +1,33 @@
+name: 问题反馈
+description: 报告教程中的错误、失效链接或其他问题
+title: "[问题] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请描述你遇到的问题；如涉及具体章节，请注明位置（如 2.5.1）。截图可直接拖入下方输入框。
+
+  - type: input
+    id: location
+    attributes:
+      label: 问题位置
+      placeholder: 例如：2.5.1 Keppy's MIDI Converter
+    validations:
+      required: true
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: 问题描述
+      description: 发生了什么？你期望的正确内容或结果是什么？
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: 你的名称（可选）
+      placeholder: 可匿名
+    validations:
+      required: false

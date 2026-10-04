@@ -1,0 +1,41 @@
+name: 勘误修正
+description: 指出并修正教程中的笔误、错误描述或过时内容
+title: "[修正] "
+labels: ["fix"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请指出原文与建议改法；能直接给出修改后的文字最好。修正会经维护组复核后录入，并在“鸣谢”中记录。
+
+  - type: input
+    id: location
+    attributes:
+      label: 位置
+      description: 章节号 + 原句开头几个字，便于定位
+      placeholder: 例如：3.2.2 "首先介绍画笔工具……"
+    validations:
+      required: true
+
+  - type: textarea
+    id: original
+    attributes:
+      label: 原文
+    validations:
+      required: true
+
+  - type: textarea
+    id: corrected
+    attributes:
+      label: 建议修改为
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: 作者署名
+      description: 用于教程“鸣谢”，可匿名
+      placeholder: 例如：XXX / 匿名
+    validations:
+      required: true

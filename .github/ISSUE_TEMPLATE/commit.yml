@@ -1,0 +1,69 @@
+name: 投稿
+description: 提交教程新内容（正文、图片等）
+title: "[投稿] "
+labels: ["commit"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢为《黑乐谱综合教程》投稿！提交前请先阅读[《编写指南》](https://github.com/IMT11D/black-midi-tutorial/blob/main/CONTRIBUTING.md)。
+
+        - **正文严禁由 AI 工具直接撰写或改写**；AI / Agent 仅可用于格式整理与语言精练。
+        - 正文可以直接粘贴在下方输入框；较长内容与图片请**拖拽上传附件**（文档类 ≤ 25MB，图片 ≤ 10MB）。
+        - **格式不用过度纠结**：标题空行、图片路径、公式写法等由维护组与 CI 自动规范化，你只需保证内容与编号正确。
+
+  - type: input
+    id: chapter
+    attributes:
+      label: 目标章节
+      description: 希望投稿到哪一章、哪一节？
+      placeholder: 例如：3.2.2 MIDI编辑基本操作方法
+    validations:
+      required: true
+
+  - type: input
+    id: position
+    attributes:
+      label: 插入位置
+      placeholder: 例如：3.2.2 节末尾 / 新增 3.4 节
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: 作者署名
+      description: 用于教程“鸣谢”，可匿名
+      placeholder: 例如：XXX / 匿名
+    validations:
+      required: true
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 正文内容 / 内容简述
+      description: 可直接粘贴正文；附件请拖拽到下方输入框上传
+      placeholder: 正文……（或在这里简述内容并上传附件）
+    validations:
+      required: true
+
+  - type: textarea
+    id: images
+    attributes:
+      label: 图片与附件说明
+      description: 如有图片，请说明每张图希望插入的位置；图片可直接拖拽上传到本输入框
+      placeholder: 例如：图1 插在第二段之后；图2 插在公式下方
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 提交确认
+      options:
+        - label: 我已阅读《编写指南》，确认正文为本人撰写（非 AI 直接生成）
+          required: true
+        - label: 标题编号沿用教程现有体系，未打乱既有编号
+          required: true
+        - label: 如有图片/附件已随本 Issue 上传（无附件也请勾选）
+          required: true

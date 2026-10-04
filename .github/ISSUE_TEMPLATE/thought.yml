@@ -1,0 +1,24 @@
+name: 想法与建议
+description: 对教程结构、协作方式或内容方向提出想法
+title: "[想法] "
+labels: ["thought"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎提出任何关于教程结构与协作方式的建议；不要求格式，说清楚想法即可。
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: 内容
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: 你的名称（可选）
+      placeholder: 可匿名
+    validations:
+      required: false

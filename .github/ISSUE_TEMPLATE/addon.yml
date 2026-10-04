@@ -1,0 +1,42 @@
+name: 内容增补
+description: 为现有章节补充内容（新工具、新方法、补充说明等）
+title: "[增补] "
+labels: ["addon"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        增补内容可参考[《编写指南》](https://github.com/IMT11D/black-midi-tutorial/blob/main/CONTRIBUTING.md)；正文可以直接粘贴，较长内容与图片请拖拽上传附件。
+
+  - type: input
+    id: location
+    attributes:
+      label: 增补到哪个章节 / 位置
+      placeholder: 例如：3.3.5 常用控制器的简易操作手法（末尾）
+    validations:
+      required: true
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 增补内容
+      description: 可直接粘贴正文；附件请拖拽到本输入框上传
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: 作者署名
+      description: 用于教程“鸣谢”，可匿名
+      placeholder: 例如：XXX / 匿名
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 提交确认
+      options:
+        - label: 我已阅读《编写指南》，确认正文为本人撰写（非 AI 直接生成）
+          required: true

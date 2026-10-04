@@ -3,12 +3,14 @@
 版本号自动更新（供 GitHub Actions 在合并/推送时调用）
 
 规则:
-- 版本号格式：年-月-日-当日序号，如 26-10-04-01（序号两位，同日递增，跨日重置）
+- 普通版本：年-月-日-当日序号，如 26-10-04-01（序号两位，同日递增，跨日重置）
+- Release 版本：在版本号后加 -REL，如 26-10-04-01-REL，表示可对外分发的正式版本
 - 同时更新 docs/00-前言.md 的「版本号」行与 README.md 的「当前版本 **…**」
 - 时区按北京时间（Asia/Shanghai）
 
 用法:
-    python bump_version.py
+    python bump_version.py            # 递增版本号（合并/推送时自动调用）
+    python bump_version.py --release  # 将当前版本标记为 Release（追加 -REL 后缀）
 """
 import os
 import re
@@ -33,7 +35,7 @@ except Exception:
 
 
 def next_version(current, today):
-    """current: 当前版本字符串；today: datetime.date；返回新版本字符串"""
+    """current: 当前版本字符串；today: datetime.date；返回递增后的新版本字符串"""
     m = VERSION_RE.match(current)
     if not m:
         raise ValueError(f"无法解析当前版本号: {current!r}")
@@ -45,29 +47,61 @@ def next_version(current, today):
     return f"{date_part}-{nn:02d}"
 
 
-def main():
-    with open(FOREWORD, "r", encoding="utf-8", newline="") as f:
-        fw = f.read()
+def _read(path):
+    with open(path, "r", encoding="utf-8", newline="") as f:
+        return f.read()
+
+
+def _write(path, text):
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        f.write(text)
+
+
+def get_current():
+    """读取前言中的当前版本号"""
+    fw = _read(FOREWORD)
     m = FOREWORD_RE.search(fw)
     if not m:
         sys.exit("未能在 docs/00-前言.md 找到「版本号……」行")
-    current = m.group(2)
-    new = next_version(current, datetime.now(TZ).date())
+    return m.group(2)
 
+
+def apply_version(current, new):
+    """把两个文件中的版本号从 current 替换为 new"""
+    fw = _read(FOREWORD)
+    m = FOREWORD_RE.search(fw)
+    if not m:
+        sys.exit("未能在 docs/00-前言.md 找到「版本号……」行")
+    if m.group(2) != current:
+        sys.exit(f"前言中的版本号({m.group(2)})与预期({current})不一致")
     fw_new = FOREWORD_RE.sub(lambda mm: f"{mm.group(1)}{new}", fw, count=1)
-    with open(FOREWORD, "w", encoding="utf-8", newline="") as f:
-        f.write(fw_new)
+    _write(FOREWORD, fw_new)
 
-    with open(README, "r", encoding="utf-8", newline="") as f:
-        rd = f.read()
+    rd = _read(README)
     if not README_RE.search(rd):
         sys.exit("未能在 README.md 找到「当前版本 **……**」")
     rd_new = README_RE.sub(lambda mm: f"{mm.group(1)}{new}{mm.group(3)}", rd, count=1)
-    with open(README, "w", encoding="utf-8", newline="") as f:
-        f.write(rd_new)
+    _write(README, rd_new)
 
+
+def main():
+    current = get_current()
+    new = next_version(current, datetime.now(TZ).date())
+    apply_version(current, new)
     print(f"版本号已更新: {current} -> {new}")
 
 
+def mark_release():
+    current = get_current()
+    if current.endswith("-REL"):
+        sys.exit(f"当前版本已是 Release: {current}")
+    new = current + "-REL"
+    apply_version(current, new)
+    print(f"已标记 Release: {current} -> {new}")
+
+
 if __name__ == "__main__":
-    main()
+    if "--release" in sys.argv[1:]:
+        mark_release()
+    else:
+        main()
