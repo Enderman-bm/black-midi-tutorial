@@ -20,8 +20,9 @@ FOREWORD = os.path.join(ROOT, "docs", "00-前言.md")
 README = os.path.join(ROOT, "README.md")
 
 VERSION_RE = re.compile(r"^(\d{2})-(\d{2})-(\d{2})(?:-(\d{1,3}))?(?:-REL)?$")
-FOREWORD_RE = re.compile(r"^(版本号)([0-9\-REL]+)\s*$", re.M)
-README_RE = re.compile(r"(当前版本 \*\*)([0-9\-REL]+)(\*\*)")
+# 注意：结束位置必须精确停在版本号本身，不能带 \s*$（会吞掉行尾与空行）
+FOREWORD_RE = re.compile(r"^(版本号)(\d{2}-\d{2}-\d{2}(?:-\d{1,3})?(?:-REL)?)", re.M)
+README_RE = re.compile(r"(当前版本 \*\*)(\d{2}-\d{2}-\d{2}(?:-\d{1,3})?(?:-REL)?)(\*\*)")
 
 try:
     from zoneinfo import ZoneInfo
