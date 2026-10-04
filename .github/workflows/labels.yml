@@ -13,12 +13,12 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: 创建缺失的标签
+      - name: 创建/更新标签
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           create() {
-            gh label create "$1" --color "$2" --description "$3" 2>/dev/null && echo "已创建: $1" || echo "已存在，跳过: $1"
+            gh label create "$1" --repo "$GITHUB_REPOSITORY" --color "$2" --description "$3" --force
           }
           create bug     d73a4a "问题反馈"
           create commit  0e8a16 "内容投稿"
