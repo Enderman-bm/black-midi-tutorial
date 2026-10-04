@@ -17,3 +17,12 @@ mark {
   padding: 0 0.2em;
   border-radius: 0.2em;
 }
+
+/* 链接配色：文档内跳转=绿色，站外 URL=蓝色 */
+.markdown-section a {
+  color: #42b983;
+}
+.markdown-section a[target="_blank"],
+.markdown-section a[href^="http"] {
+  color: #2a6fdb;
+}

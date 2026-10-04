@@ -147,7 +147,7 @@
 - 如需本地生成/预览侧边栏：`python gen_toc_from_docs.py`；
 - 备注：`docs/_sidebar.md` 为历史遗留文件，站点不加载，可忽略。
 
-### 6. 文字颜色与高亮
+### 6. 文字颜色、高亮与链接
 
 - 正文可使用 HTML 的 `span` 指定颜色（Docsify 会直接渲染原始 HTML），颜色类定义在根目录 `custom.css`：
 
@@ -157,6 +157,7 @@
 
   可用颜色类：`red`、`orange`、`green`、`blue`、`purple`、`gray`。
 - 高亮请使用 `<span class="mark">……</span>`，对应浅黄色底纹样式。
+- **链接**：引用外部网址请写成 `[链接文字](https://…)` 或 `<https://…>`（尖括号），**不要裸写 URL**——裸链接会把后面的中文标点一并吞入链接范围（CI 会自动补尖括号）。网站中站外链接显示为**蓝色**，站内跳转显示为**绿色**。
 - 注意：**不要给标题上色**（HTML 会影响侧边栏锚点生成与目录显示）；公式内着色可用 `$\textcolor{red}{文字}$`。
 
 ### 7. 其他要求
@@ -173,7 +174,7 @@
 ```bash
 python gen_toc_from_docs.py            # 由正文重新生成 docs/SUMMARY.md（推送 main 后 CI 自动执行，本地一般无需手动）
 python fix_toc_and_spacing.py          # 检查锚点与格式规范（只报告，不改文件）
-python fix_toc_and_spacing.py --apply  # 应用格式规范：标题空行、图片路径、公式写法、侧边栏锚点（推送 main 后 CI 自动执行）
+python fix_toc_and_spacing.py --apply  # 应用格式规范：标题空行、图片路径、公式写法、裸链接、侧边栏锚点（推送 main 后 CI 自动执行）
 ```
 
 ## 五、本地预览

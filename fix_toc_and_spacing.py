@@ -13,7 +13,7 @@
 2. 修正 docs/SUMMARY.md 与 docs/_sidebar.md 的锚点（保留显示文本与缩进）
 3. 规范化 docs/*.md 标题前空行: ## 前空5行, ### 前空3行
    （公式块/代码块内部不处理）
-4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、文件末尾换行
+4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、裸链接（加尖括号）、文件末尾换行
 """
 import os
 import re
@@ -169,6 +169,24 @@ def fix_spacing(content):
 
 
 # ---------------------------------------------------------------- 内容格式规范化
+# 裸链接中不应出现的字符（全角标点 / 中日韩文字），出现即说明链接吞掉了后续文字
+URL_STOP = set("），。；：？！、》《「」『』“”‘’（）【】…")
+BARE_URL_RE = re.compile(r"(?<!\]\()(?<![<`A-Za-z0-9_])(https?://\S+)")
+
+
+def _wrap_bare_url(m):
+    """裸链接后若紧跟中文或全角标点（会被渲染吞入链接），自动用尖括号截断"""
+    url = m.group(1)
+    cut = len(url)
+    for idx, ch in enumerate(url):
+        if ch in URL_STOP or "\u4e00" <= ch <= "\u9fff":
+            cut = idx
+            break
+    if cut == len(url):
+        return m.group(0)
+    return "<" + url[:cut] + ">" + url[cut:]
+
+
 def fix_content(content):
     """规范化公式写法、图片引用路径与文件末尾换行"""
     eol = "\r\n" if "\r\n" in content else "\n"
@@ -195,7 +213,32 @@ def fix_content(content):
     if n:
         changes.append(f"图片路径 {n} 处")
 
-    # 4) 文件末尾确保换行
+    # 4) 裸链接修复（跳过代码围栏）
+    out_lines = []
+    in_fence = False
+    fence = ""
+    n_url = 0
+    for ln_ in norm.split("\n"):
+        mf = re.match(r"^\s*(```+|~~~+)", ln_)
+        if mf:
+            marker = mf.group(1)[0]
+            if not in_fence:
+                in_fence, fence = True, marker
+            elif marker == fence:
+                in_fence = False
+            out_lines.append(ln_)
+            continue
+        if not in_fence:
+            new_ln = BARE_URL_RE.sub(_wrap_bare_url, ln_)
+            if new_ln != ln_:
+                n_url += 1
+                ln_ = new_ln
+        out_lines.append(ln_)
+    if n_url:
+        changes.append(f"裸链接加尖括号 {n_url} 处")
+        norm = "\n".join(out_lines)
+
+    # 5) 文件末尾确保换行
     if norm and not norm.endswith("\n"):
         norm += "\n"
         changes.append("补文件末尾换行")
