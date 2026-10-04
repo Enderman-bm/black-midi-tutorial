@@ -16,7 +16,7 @@
 
 ## 在线阅读
 
-- **在线教程：<https://imt11d.github.io/black-music-tutorial/>**
+- **在线教程：<https://imt11d.github.io/black-midi-tutorial/>**
 - 站点由 [Docsify](https://docsify.js.org) 驱动，支持侧边栏导航，无需构建，开箱即用。
 
 ## 内容结构

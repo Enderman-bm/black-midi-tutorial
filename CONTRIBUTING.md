@@ -2,7 +2,7 @@
 
 本指南面向希望参与《黑乐谱综合教程》编写的创作者，说明**提交方式**、**AI / Agent 使用规则**与**当前文档格式规范**。
 
-在线教程：<https://imt11d.github.io/black-music-tutorial/>
+在线教程：<https://imt11d.github.io/black-midi-tutorial/>
 
 ## 一、参与方式
 
@@ -29,7 +29,7 @@
 
 无法访问 GitHub 时，可通过社区 NAS 的**投稿链接**上传内容（使用群晖“文件请求”功能，上传者**无需 DSM 账号**，内容仅维护组可见）：
 
-> **投稿链接：<http://cbmsmedia.online:5000/sharing/C2EPVLvSJ>**
+> **投稿链接：<http://cbmsmedia.online/sharing/C2EPVLvSJ>**
 
 - 支持常见文件类型；受系统限制**不能上传文件夹**，文件较多时请打包为 `.zip` 后上传；
 - 上传时需填写你的名字，文件会自动归档到以投稿人命名的子文件夹中；
