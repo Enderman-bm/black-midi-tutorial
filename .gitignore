@@ -1,2 +1,6 @@
 # docs/ 下冗余的嵌套 media 副本（未被任何文档引用，网站不需要）
 docs/media/media/
+
+# Python 运行产物
+__pycache__/
+*.pyc

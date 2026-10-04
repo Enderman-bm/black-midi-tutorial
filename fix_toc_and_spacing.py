@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-修复侧边栏锚点 + 标题前空行格式
+修复侧边栏锚点 + 正文格式规范化（本地与 GitHub Actions 共用）
 
 用法:
     python fix_toc_and_spacing.py          # 仅检查，输出将修复的问题
@@ -13,6 +13,7 @@
 2. 修正 docs/SUMMARY.md 与 docs/_sidebar.md 的锚点（保留显示文本与缩进）
 3. 规范化 docs/*.md 标题前空行: ## 前空5行, ### 前空3行
    （公式块/代码块内部不处理）
+4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、文件末尾换行
 """
 import os
 import re
@@ -167,6 +168,42 @@ def fix_spacing(content):
     return eol.join(out), changed
 
 
+# ---------------------------------------------------------------- 内容格式规范化
+def fix_content(content):
+    """规范化公式写法、图片引用路径与文件末尾换行"""
+    eol = "\r\n" if "\r\n" in content else "\n"
+    norm = content.replace("\r\n", "\n") if eol == "\r\n" else content
+    changes = []
+
+    # 1) pandoc 遗留行内公式 $`...`$ -> $...$
+    norm, n = re.subn(r"\$`([^`\n]+)`\$", r"$\1$", norm)
+    if n:
+        changes.append(f"行内公式写法 {n} 处")
+
+    # 2) ```math 代码块 -> $$...$$
+    norm, n = re.subn(
+        r"```\s*math\s*\n(.*?)\n```",
+        lambda m: "$$\n" + m.group(1) + "\n$$",
+        norm,
+        flags=re.DOTALL,
+    )
+    if n:
+        changes.append(f"math 代码块 {n} 处")
+
+    # 3) 图片引用路径 ./media/、../media/ -> media/
+    norm, n = re.subn(r"\]\((?:\.{1,2}/)+media/", "](media/", norm)
+    if n:
+        changes.append(f"图片路径 {n} 处")
+
+    # 4) 文件末尾确保换行
+    if norm and not norm.endswith("\n"):
+        norm += "\n"
+        changes.append("补文件末尾换行")
+
+    result = norm.replace("\n", "\r\n") if eol == "\r\n" else norm
+    return result, changes
+
+
 def main():
     # 1. 侧边栏
     for name in ("SUMMARY.md", "_sidebar.md"):
@@ -190,19 +227,24 @@ def main():
             print(f"  已写入 {name}")
         print()
 
-    # 2. 标题空行
+    # 2. 正文格式规范化（标题空行 + 公式/图片路径/末尾换行）
     docs_files = sorted(
         f for f in os.listdir(DOCS)
         if f.endswith(".md") and f not in ("SUMMARY.md", "_sidebar.md")
     )
-    print("=== 空行规范化 (## 前5行空行, ### 前3行空行) ===")
+    print("=== 正文格式规范化（标题空行: ## 前5行 / ### 前3行；公式、图片路径等） ===")
     for fn in docs_files:
         path = os.path.join(DOCS, fn)
         with open(path, "r", encoding="utf-8", newline="") as f:
             content = f.read()
         new_content, changed = fix_spacing(content)
-        if changed:
-            print(f"  {fn}: 调整 {changed} 处标题间距")
+        new_content, changes = fix_content(new_content)
+        if changed or changes:
+            desc = []
+            if changed:
+                desc.append(f"标题间距 {changed} 处")
+            desc.extend(changes)
+            print(f"  {fn}: " + "，".join(desc))
             if APPLY:
                 with open(path, "w", encoding="utf-8", newline="") as f:
                     f.write(new_content)

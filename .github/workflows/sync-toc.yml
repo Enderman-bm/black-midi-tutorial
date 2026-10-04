@@ -1,4 +1,4 @@
-name: 自动同步侧边栏
+name: 自动同步侧边栏与格式
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - 'docs/**.md'
       - 'gen_toc_from_docs.py'
+      - 'fix_toc_and_spacing.py'
       - '!docs/SUMMARY.md'
   workflow_dispatch:
 
@@ -13,23 +14,26 @@ permissions:
   contents: write
 
 jobs:
-  sync-summary:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - name: 检出仓库
         uses: actions/checkout@v4
 
-      - name: 重新生成 docs/SUMMARY.md
+      - name: 重新生成侧边栏
         run: python3 gen_toc_from_docs.py
+
+      - name: 自动校正格式（标题空行、图片路径、公式写法、锚点）
+        run: python3 fix_toc_and_spacing.py --apply
 
       - name: 如有变化则提交并推送
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/SUMMARY.md
+          git add docs/
           if git diff --cached --quiet; then
-            echo "侧边栏无变化，跳过提交"
+            echo "无变化，跳过提交"
           else
-            git commit -m "自动同步侧边栏：docs/SUMMARY.md"
+            git commit -m "自动同步侧边栏与格式规范"
             git push
           fi

@@ -1,0 +1,19 @@
+/* 黑乐谱综合教程 - 自定义样式（由 index.html 引入） */
+
+/* 文字颜色工具类
+   用法：<span class="red">文字</span> */
+.red    { color: #c0392b; }
+.orange { color: #d35400; }
+.green  { color: #27ae60; }
+.blue   { color: #2980b9; }
+.purple { color: #8e44ad; }
+.gray   { color: #7f8c8d; }
+
+/* 文字高亮（正文中已有的 class="mark" 标记） */
+.mark,
+mark {
+  background: #fff3a3;
+  color: inherit;
+  padding: 0 0.2em;
+  border-radius: 0.2em;
+}

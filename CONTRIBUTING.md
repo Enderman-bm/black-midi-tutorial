@@ -14,10 +14,14 @@
 2. 在 `docs/` 下找到对应章节文件进行编辑（如 `docs/03-黑乐谱MIDI制作-音频部分.md`）；
 3. 新增图片放入 `docs/media/`，引用方式见下文；
 4. 启动本地预览确认页面显示正常（见“五、本地预览”）；
-5. 若新增、删除或修改了标题：无需手动维护侧边栏，推送到 `main` 后由 GitHub Actions 自动更新 `docs/SUMMARY.md`；如需本地预览可运行 `python gen_toc_from_docs.py`；
+5. 无需手动维护侧边栏与格式：推送到 `main` 后，GitHub Actions 会自动更新 `docs/SUMMARY.md`，并按规范校正标题空行、图片路径、公式写法等；如需本地预览修正结果，可运行 `python fix_toc_and_spacing.py --apply`；
 6. 提交 Pull Request，并在说明中写清：**目标章节、改动概述**。
 
-**（2）Issue 投稿（不熟悉 Git 的贡献者）**
+**（2）网页编辑器（不会 Git 命令的贡献者）**
+
+无需安装任何 Git 工具：在 GitHub 仓库中打开 `docs/` 下对应的章节文件，点击右上角的铅笔图标（Edit this file）即可在线编辑；编辑完成后按页面提示提交（GitHub 会自动创建分支与 Pull Request）。图片可通过 Issue/PR 评论框拖拽上传，或由维护组按规范放入 `docs/media/`。
+
+**（3）Issue 投稿（不熟悉 Git 的贡献者）**
 
 没有使用过 Git 也可以投稿：在仓库中新建 Issue（选择“投稿”模板），按模板填写目标章节、插入位置与署名，并把 txt / Word / 图片等文件**直接拖拽到输入框上传附件**（文档类 ≤ 25MB，图片 ≤ 10MB）。
 
@@ -32,6 +36,8 @@
 - 移动端注意：Android 浏览器无文件类型限制；iOS 的 Chrome 仅支持图片、Safari 仅支持图片与视频，建议使用电脑上传。
 
 上传时请同时附上一份投稿说明（见“4. 投稿说明模板”）。
+
+> 说明：NAS 链接仅作为**投稿投递渠道**（收集原始稿件），教程的唯一权威版本始终是本 Git 仓库。每份投稿都会先登记（台账/Issue），经格式与内容核对后由维护组录入，这样可以避免“看不见的版本冲突”。
 
 ### 3. 问题反馈（Issue）
 
@@ -55,7 +61,7 @@
 
 1. 维护组收到投稿后，登记台账（收到时间 / 投稿人 / 目标章节 / 状态：待录入、已录入、已回复）；
 2. 核对格式与技术内容，必要时与投稿人确认细节；
-3. 录入正文后推送即可（侧边栏由 CI 自动更新）；建议先运行 `python fix_toc_and_spacing.py --apply` 校正空行与锚点格式；
+3. 录入正文后推送即可（侧边栏与格式规范由 CI 自动校正）；也可在本地先运行 `python fix_toc_and_spacing.py --apply` 预览修正结果；
 4. 发布后回复投稿人，并在教程“鸣谢”中记录贡献。
 
 ## 二、AI / Agent 使用规则
@@ -107,7 +113,7 @@
   ### 3.2.1 MIDI编辑基本操作方法
   ```
 
-- 可用脚本一键规范化：`python fix_toc_and_spacing.py --apply`（**不会改动公式内容**）。
+- 可用脚本一键规范化：`python fix_toc_and_spacing.py --apply`（推送到 `main` 后 CI 会自动执行；**不会改动公式内容**）。
 
 ### 3. 图片
 
@@ -118,7 +124,7 @@
   ![描述](media/image131.png)
   ```
 
-- 不要写成 `./media/...`、`../media/...` 或绝对路径；不要重命名、移动或删除 `docs/media/` 中已有的图片。
+- 不要写成 `./media/...`、`../media/...` 或绝对路径（CI 会自动纠正为 `media/...`）；不要重命名、移动或删除 `docs/media/` 中已有的图片。
 
 ### 4. 公式
 
@@ -132,7 +138,7 @@
     $$
     ```
 
-- 历史遗留的 pandoc 写法（`` $`…`$ `` 与 math 代码块）已全部统一修复，**请勿再使用**，也不要改动已有公式的包裹格式。
+- 历史遗留的 pandoc 写法（`` $`…`$ `` 与 math 代码块）已全部统一修复，**请勿再使用**（如再次出现，CI 会自动转换）；也不要改动已有公式的包裹格式。
 
 ### 5. 侧边栏与锚点
 
@@ -141,7 +147,19 @@
 - 如需本地生成/预览侧边栏：`python gen_toc_from_docs.py`；
 - 备注：`docs/_sidebar.md` 为历史遗留文件，站点不加载，可忽略。
 
-### 6. 其他要求
+### 6. 文字颜色与高亮
+
+- 正文可使用 HTML 的 `span` 指定颜色（Docsify 会直接渲染原始 HTML），颜色类定义在根目录 `custom.css`：
+
+  ```markdown
+  <span class="red">红色文字</span>、<span class="blue">蓝色文字</span>
+  ```
+
+  可用颜色类：`red`、`orange`、`green`、`blue`、`purple`、`gray`。
+- 高亮请使用 `<span class="mark">……</span>`，对应浅黄色底纹样式。
+- 注意：**不要给标题上色**（HTML 会影响侧边栏锚点生成与目录显示）；公式内着色可用 `$\textcolor{red}{文字}$`。
+
+### 7. 其他要求
 
 - 文件统一使用 UTF-8 编码；
 - 中文正文使用中文标点（，。：“”（）等）；代码、路径、文件名与专有名词保留原文写法；
@@ -154,8 +172,8 @@
 
 ```bash
 python gen_toc_from_docs.py            # 由正文重新生成 docs/SUMMARY.md（推送 main 后 CI 自动执行，本地一般无需手动）
-python fix_toc_and_spacing.py          # 检查锚点与标题空行（只报告，不改文件）
-python fix_toc_and_spacing.py --apply  # 应用空行规范，并修正 SUMMARY.md 中的错误锚点
+python fix_toc_and_spacing.py          # 检查锚点与格式规范（只报告，不改文件）
+python fix_toc_and_spacing.py --apply  # 应用格式规范：标题空行、图片路径、公式写法、侧边栏锚点（推送 main 后 CI 自动执行）
 ```
 
 ## 五、本地预览
