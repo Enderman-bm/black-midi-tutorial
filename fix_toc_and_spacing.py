@@ -16,6 +16,7 @@
 4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、裸链接（加尖括号）、
    单波浪线转义（防删除线）、文件末尾换行
 5. 图片引用检查（仅报告不修改）: 正文引用的 media/xxx 是否存在
+6. 标题编号检查（仅报告不修改）: 全局重复编号、同级编号缺口
 """
 import os
 import re
@@ -267,6 +268,44 @@ def fix_content(content):
     return result, changes
 
 
+# ---------------------------------------------------------------- 编号检查
+NUM_RE = re.compile(r"^(\d+(?:\.\d+)*)")
+
+
+def check_numbering(per_file):
+    """per_file: {文件名: [(level, 编号), ...]}；返回问题列表（仅报告）"""
+    problems = []
+    all_nums = {}
+    for fn, nums in per_file.items():
+        for _, num in nums:
+            all_nums.setdefault(num, []).append(fn)
+    for num, fns in all_nums.items():
+        if len(fns) > 1:
+            problems.append(f"重复编号 {num}（出现在：{'、'.join(sorted(set(fns)))}）")
+    for fn, nums in per_file.items():
+        m = re.match(r"^(\d+)", fn)
+        if not m:
+            continue
+        chap = int(m.group(1))
+        h2 = []
+        h3 = {}
+        for lv, num in nums:
+            parts = num.split(".")
+            if lv == 2 and len(parts) == 2 and parts[0] == str(chap):
+                h2.append(int(parts[1]))
+            elif lv == 3 and len(parts) == 3:
+                h3.setdefault(".".join(parts[:2]), []).append(int(parts[2]))
+        if h2:
+            for i in range(1, max(h2) + 1):
+                if i not in h2:
+                    problems.append(f"{fn}: 缺少编号 {chap}.{i}")
+        for parent, ks in h3.items():
+            for i in range(1, max(ks) + 1):
+                if i not in ks:
+                    problems.append(f"{fn}: {parent} 缺少 .{i}")
+    return problems
+
+
 def main():
     # 1. 侧边栏
     for name in ("SUMMARY.md", "_sidebar.md"):
@@ -338,6 +377,27 @@ def main():
         print(f"共 {len(missing)} 处图片引用缺失（请检查文件名大小写与是否已上传）")
     else:
         print("所有图片引用均存在 ✓")
+
+    # 4. 标题编号检查（仅报告，不修改文件）
+    print("=== 标题编号检查 ===")
+    per_file_nums = {}
+    for fn in docs_files:
+        path = os.path.join(DOCS, fn)
+        with open(path, "r", encoding="utf-8") as f:
+            lines = f.read().split("\n")
+        nums = []
+        for lv, text in extract_headings(lines):
+            m = NUM_RE.match(text)
+            if m:
+                nums.append((lv, m.group(1)))
+        per_file_nums[fn] = nums
+    problems = check_numbering(per_file_nums)
+    if problems:
+        for p in problems:
+            print(f"  !! {p}")
+        print(f"共 {len(problems)} 处编号问题（请人工确认；编号变更会同步影响侧边栏锚点，需重新生成）")
+    else:
+        print("所有标题编号连续且无重复 ✓")
 
     print("完成。" + ("" if APPLY else " (未写入, 加 --apply 生效)"))
 
