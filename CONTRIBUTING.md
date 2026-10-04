@@ -182,7 +182,6 @@
 - 站点侧边栏的唯一来源是 `docs/SUMMARY.md`，由脚本从正文自动生成；**推送到 `main` 后 GitHub Actions 会自动同步**（工作流见 `.github/workflows/sync-toc.yml`），通常无需手动操作；
 - 锚点按 Docsify 规则生成（字母小写、删除指定标点、空格转 `-`、数字开头加 `_` 前缀、同页重名追加 `-1` 等），**请勿手动修改锚点**；
 - 如需本地生成/预览侧边栏：`python gen_toc_from_docs.py`；
-- 备注：`docs/_sidebar.md` 为历史遗留文件，站点不加载，可忽略。
 
 ### 6. 文字颜色、高亮与链接
 

@@ -10,7 +10,7 @@
 1. 按 docsify@4 真实 slugify 规则重算 docs/*.md 全部标题锚点
    （小写A-Z -> 去HTML标签 -> 去特定标点[保留全角标点] -> 空白转- ->
     合并- -> 数字开头加_ -> 同页重名 -1/-2）
-2. 修正 docs/SUMMARY.md 与 docs/_sidebar.md 的锚点（保留显示文本与缩进）
+2. 修正 docs/SUMMARY.md 的锚点（保留显示文本与缩进）
 3. 规范化 docs/*.md 标题前空行: ## 前空5行, ### 前空3行
    （公式块/代码块内部不处理）
 4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、裸链接（加尖括号）、
@@ -308,7 +308,7 @@ def check_numbering(per_file):
 
 def main():
     # 1. 侧边栏
-    for name in ("SUMMARY.md", "_sidebar.md"):
+    for name in ("SUMMARY.md",):
         path = os.path.join(DOCS, name)
         if not os.path.isfile(path):
             print(f"[跳过] {name} 不存在")
@@ -332,7 +332,7 @@ def main():
     # 2. 正文格式规范化（标题空行 + 公式/图片路径/末尾换行）
     docs_files = sorted(
         f for f in os.listdir(DOCS)
-        if f.endswith(".md") and f not in ("SUMMARY.md", "_sidebar.md")
+        if f.endswith(".md") and f != "SUMMARY.md"
     )
     print("=== 正文格式规范化（标题空行: ## 前5行 / ### 前3行；公式、图片路径等） ===")
     for fn in docs_files:
