@@ -2,20 +2,34 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>黑乐谱基础教程</title>
+  <title>黑乐谱综合教程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Docsify 默认主题样式 -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
+  <!-- KaTeX 样式 -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"/>
 </head>
 <body>
   <div id="app">加载中...</div>
+
   <script>
     window.$docsify = {
-      name: '黑乐谱基础教程',
-      loadSidebar: true,
-      subMaxLevel: 3,
-      auto2top: true
+      name: '黑乐谱综合教程',
+      loadSidebar: 'SUMMARY.md',
+      subMaxLevel: 0,
+      auto2top: true,
+      homepage: '00-前言.md',
+      basePath: 'docs/'
     }
   </script>
+
+  <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- KaTeX 引擎 -->
+  <script src="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <!-- Markdown 解析器（docsify-katex 依赖它） -->
+  <script src="//cdn.jsdelivr.net/npm/marked@4"></script>
+  <!-- docsify-katex 插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
 </body>
 </html>
