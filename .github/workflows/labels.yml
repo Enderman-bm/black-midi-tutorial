@@ -1,0 +1,27 @@
+name: 同步仓库标签
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/labels.yml'
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 创建缺失的标签
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          create() {
+            gh label create "$1" --color "$2" --description "$3" 2>/dev/null && echo "已创建: $1" || echo "已存在，跳过: $1"
+          }
+          create bug     d73a4a "问题反馈"
+          create commit  0e8a16 "内容投稿"
+          create fix     1d76db "勘误修正"
+          create addon   5319e7 "内容增补"
+          create thought fbca04 "想法与建议"
