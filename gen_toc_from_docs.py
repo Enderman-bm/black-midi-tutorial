@@ -86,7 +86,8 @@ for fname in md_files:
 
         lines.append(f"{indent}* [{display}]({fname}#{anchor})")
 
-with open(OUTPUT, "w", encoding="utf-8", newline="") as f:
-    f.write("\r\n".join(lines) + "\r\n")
+# 使用平台默认换行（Windows 输出 CRLF，Linux/CI 输出 LF），保证本地与 CI 生成结果一致
+with open(OUTPUT, "w", encoding="utf-8") as f:
+    f.write("\n".join(lines) + "\n")
 
 print(f"已生成 {OUTPUT}，共 {len(lines)} 个条目。")
