@@ -13,7 +13,9 @@
 2. 修正 docs/SUMMARY.md 与 docs/_sidebar.md 的锚点（保留显示文本与缩进）
 3. 规范化 docs/*.md 标题前空行: ## 前空5行, ### 前空3行
    （公式块/代码块内部不处理）
-4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、裸链接（加尖括号）、文件末尾换行
+4. 规范化其他格式: pandoc 遗留公式写法、图片引用路径、裸链接（加尖括号）、
+   单波浪线转义（防删除线）、文件末尾换行
+5. 图片引用检查（仅报告不修改）: 正文引用的 media/xxx 是否存在
 """
 import os
 import re
@@ -172,6 +174,16 @@ def fix_spacing(content):
 # 裸链接中不应出现的字符（全角标点 / 中日韩文字），出现即说明链接吞掉了后续文字
 URL_STOP = set("），。；：？！、》《「」『』“”‘’（）【】…")
 BARE_URL_RE = re.compile(r"(?<!\]\()(?<![<`A-Za-z0-9_])(https?://\S+)")
+# 单个 ~ 会被渲染器当作删除线定界符（两个配对即划掉中间文字），统一转义为 \~
+SINGLE_TILDE_RE = re.compile(r"(?<!\\)(?<!~)~(?!~)")
+
+
+def _escape_tildes(ln):
+    """按反引号分段，仅转义行内代码之外的单波浪线"""
+    parts = ln.split("`")
+    for i in range(0, len(parts), 2):  # 偶数下标段位于行内代码之外
+        parts[i] = SINGLE_TILDE_RE.sub(lambda m: "\\~", parts[i])
+    return "`".join(parts)
 
 
 def _wrap_bare_url(m):
@@ -213,11 +225,12 @@ def fix_content(content):
     if n:
         changes.append(f"图片路径 {n} 处")
 
-    # 4) 裸链接修复（跳过代码围栏）
+    # 4) 裸链接修复 + 单波浪线转义（跳过代码围栏）
     out_lines = []
     in_fence = False
     fence = ""
     n_url = 0
+    n_tilde = 0
     for ln_ in norm.split("\n"):
         mf = re.match(r"^\s*(```+|~~~+)", ln_)
         if mf:
@@ -233,9 +246,16 @@ def fix_content(content):
             if new_ln != ln_:
                 n_url += 1
                 ln_ = new_ln
+            new_ln = _escape_tildes(ln_)
+            if new_ln != ln_:
+                n_tilde += 1
+                ln_ = new_ln
         out_lines.append(ln_)
-    if n_url:
-        changes.append(f"裸链接加尖括号 {n_url} 处")
+    if n_url or n_tilde:
+        if n_url:
+            changes.append(f"裸链接加尖括号 {n_url} 处")
+        if n_tilde:
+            changes.append(f"单波浪线转义 {n_tilde} 处")
         norm = "\n".join(out_lines)
 
     # 5) 文件末尾确保换行
@@ -291,6 +311,34 @@ def main():
             if APPLY:
                 with open(path, "w", encoding="utf-8", newline="") as f:
                     f.write(new_content)
+
+    # 3. 图片引用检查（仅报告，不修改文件）
+    print("=== 图片引用检查 ===")
+    IMG_RE = re.compile(r'!\[[^\]]*\]\(media/([^)\s]+)[^)]*\)|<img[^>]+src=["\']media/([^"\']+)["\']')
+    missing = []
+    for fn in docs_files:
+        path = os.path.join(DOCS, fn)
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        in_fence = False
+        for i, ln in enumerate(content.split("\n"), 1):
+            if re.match(r"^\s*(```+|~~~+)", ln):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            ln_clean = re.sub(r"`[^`]*`", "", ln)  # 跳过行内代码
+            for m in IMG_RE.finditer(ln_clean):
+                name = m.group(1) or m.group(2)
+                if not os.path.isfile(os.path.join(DOCS, "media", name)):
+                    missing.append((fn, i, name))
+    if missing:
+        for fn, i, name in missing:
+            print(f"  !! {fn}:{i} 引用了不存在的图片: media/{name}")
+        print(f"共 {len(missing)} 处图片引用缺失（请检查文件名大小写与是否已上传）")
+    else:
+        print("所有图片引用均存在 ✓")
+
     print("完成。" + ("" if APPLY else " (未写入, 加 --apply 生效)"))
 
 

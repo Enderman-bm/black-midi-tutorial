@@ -23,7 +23,7 @@ jobs:
       - name: 重新生成侧边栏
         run: python3 gen_toc_from_docs.py
 
-      - name: 自动校正格式（标题空行、图片路径、公式写法、裸链接、锚点）
+      - name: 自动校正格式（标题空行、图片路径、公式写法、裸链接、波浪线、锚点）
         run: python3 fix_toc_and_spacing.py --apply
 
       - name: 如有变化则提交并推送

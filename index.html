@@ -15,13 +15,26 @@
   <div id="app">加载中...</div>
 
   <script>
+    var zoomInstance = null;
     window.$docsify = {
       name: '黑乐谱综合教程',
       loadSidebar: 'SUMMARY.md',
       subMaxLevel: 0,
       auto2top: true,
       homepage: '00-前言.md',
-      basePath: 'docs/'
+      basePath: 'docs/',
+      plugins: [
+        function (hook) {
+          hook.doneEach(function () {
+            if (!window.mediumZoom) return;
+            if (zoomInstance) zoomInstance.detach();
+            zoomInstance = mediumZoom('.markdown-section img', {
+              background: 'rgba(0,0,0,0.85)',
+              margin: 24
+            });
+          });
+        }
+      ]
     }
   </script>
 
@@ -33,5 +46,7 @@
   <script src="//cdn.jsdelivr.net/npm/marked@4"></script>
   <!-- docsify-katex 插件 -->
   <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
+  <!-- 图片点击放大 -->
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
 </body>
 </html>

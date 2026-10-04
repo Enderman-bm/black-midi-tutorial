@@ -26,3 +26,29 @@ mark {
 .markdown-section a[href^="http"] {
   color: #2a6fdb;
 }
+
+/* 图片自适应：桌面端限宽 80%、限高 70vh（随屏幕等比缩放，点击可放大）；小屏保持满宽 */
+.markdown-section img {
+  display: block;
+  margin: 1em auto;
+  height: auto;
+  cursor: zoom-in;
+}
+@media screen and (min-width: 1025px) {
+  .markdown-section img {
+    max-width: 80%;
+    max-height: 70vh;
+  }
+}
+@media screen and (max-width: 1024px) {
+  .markdown-section img {
+    max-width: 100%;
+    max-height: none;
+  }
+}
+/* 单图豁免（全宽显示）：<img class="full" src="media/xxx.png"> */
+.markdown-section img.full {
+  max-width: 100%;
+  max-height: none;
+}
+
